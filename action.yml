@@ -1,0 +1,59 @@
+name: GitHub Achievements Card
+description: Generate an SVG card (or Markdown) showing how close you are to your next GitHub profile achievement.
+author: muhammedalikcb
+branding:
+  icon: award
+  color: purple
+
+inputs:
+  username:
+    description: GitHub username to check. Defaults to the repository owner.
+    required: false
+    default: ${{ github.repository_owner }}
+  output:
+    description: File to write, for example achievements.svg or achievements.md.
+    required: false
+    default: achievements.svg
+  format:
+    description: svg, markdown or json.
+    required: false
+    default: svg
+  lang:
+    description: en or tr.
+    required: false
+    default: en
+  theme:
+    description: SVG theme, auto, light or dark. Auto follows the viewer's color scheme.
+    required: false
+    default: auto
+  token:
+    description: Token used to call the GitHub API.
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - name: Build gh-achievements
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: ./gradlew --no-daemon -q installDist
+
+    - name: Generate
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        INPUT_USERNAME: ${{ inputs.username }}
+        INPUT_OUTPUT: ${{ inputs.output }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_LANG: ${{ inputs.lang }}
+        INPUT_THEME: ${{ inputs.theme }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        "$ACTION_PATH/build/install/gh-achievements/bin/gh-achievements" "$INPUT_USERNAME" \
+          --format "$INPUT_FORMAT" --lang "$INPUT_LANG" --theme "$INPUT_THEME" --output "$INPUT_OUTPUT"
