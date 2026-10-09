@@ -19,3 +19,11 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew test installDist
+      - name: Smoke test
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          build/install/gh-achievements/bin/gh-achievements --version
+          build/install/gh-achievements/bin/gh-achievements catalog --no-color > /dev/null
+          build/install/gh-achievements/bin/gh-achievements octocat --no-color
+

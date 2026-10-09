@@ -4,10 +4,10 @@ import java.time.Duration
 import java.time.Instant
 
 /** Thresholds for tiered achievements: base, x2 (bronze), x3 (silver), x4 (gold). */
-enum class TieredAchievement(val title: String, val unit: String, val thresholds: List<Int>) {
-    PULL_SHARK("Pull Shark", "merged PRs", listOf(2, 16, 128, 1024)),
-    STARSTRUCK("Starstruck", "stars on one repo", listOf(16, 128, 512, 4096)),
-    GALAXY_BRAIN("Galaxy Brain", "accepted answers", listOf(2, 8, 16, 32)),
+enum class TieredAchievement(val id: String, val title: String, val unit: Localized, val thresholds: List<Int>) {
+    PULL_SHARK("pull-shark", "Pull Shark", Localized("merged PRs", "merge edilmiş PR"), listOf(2, 16, 128, 1024)),
+    STARSTRUCK("starstruck", "Starstruck", Localized("stars on one repo", "yıldız (tek repoda)"), listOf(16, 128, 512, 4096)),
+    GALAXY_BRAIN("galaxy-brain", "Galaxy Brain", Localized("accepted answers", "kabul edilen cevap"), listOf(2, 8, 16, 32)),
 }
 
 data class TierProgress(
@@ -52,8 +52,12 @@ data class Report(
     val quickdraw: Boolean,
     val yolo: Boolean,
     val publicSponsor: Boolean,
+    /** Catalog id to whether the user has it. Only highlights the API exposes. */
     val highlights: Map<String, Boolean>,
-)
+) {
+    /** Catalog id to earned state for the one-time achievements this tool can check. */
+    val oneTime: Map<String, Boolean> = linkedMapOf("quickdraw" to quickdraw, "yolo" to yolo, "public-sponsor" to publicSponsor)
+}
 
 private val QUICKDRAW_WINDOW: Duration = Duration.ofMinutes(5)
 
@@ -67,9 +71,9 @@ fun evaluate(stats: UserStats): Report = Report(
     yolo = stats.recentMergedPrs.any { it.mergedBy.equals(stats.login, ignoreCase = true) && it.reviewCount == 0 },
     publicSponsor = stats.publicSponsorships > 0,
     highlights = linkedMapOf(
-        "Developer Program Member" to stats.isDeveloperProgramMember,
-        "Security Bug Bounty Hunter" to stats.isBountyHunter,
-        "GitHub Campus Expert" to stats.isCampusExpert,
-        "GitHub Star" to stats.isGitHubStar,
+        "developer-program-member" to stats.isDeveloperProgramMember,
+        "bug-bounty-hunter" to stats.isBountyHunter,
+        "campus-expert" to stats.isCampusExpert,
+        "github-star" to stats.isGitHubStar,
     ),
 )
