@@ -38,6 +38,8 @@ alias gh-achievements="$PWD/build/install/gh-achievements/bin/gh-achievements"
 
 Son satırdaki `alias`'ı `~/.zshrc` dosyana eklersen her terminalde kısa adıyla çalıştırabilirsin.
 
+Windows'ta `build\install\gh-achievements\bin\gh-achievements.bat` dosyasını çalıştır.
+
 ## Kullanım
 
 ```bash
